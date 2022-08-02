@@ -16,16 +16,15 @@ RSpec.describe 'Articles', type: :request do
   end
 
   describe 'POST /articles' do
-    it 'create article, has http status code 302' do
-      post articles_path params: { article: { title: 'Testing',
-                                              body: 'This is a new body of text for the latest test article' } }
+    it 'creates article, has http status code 302' do
+      post articles_path params: { article: FactoryBot.attributes_for(:article) }
       expect(response).to have_http_status(:found)
       follow_redirect!
       expect(response).to render_template(:show)
     end
 
     it 'fails to create the article without required parameters' do
-      post articles_path params: { article: { title: 'Testing' } }
+      post articles_path params: { article: FactoryBot.attributes_for(:article, title: nil) }
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response).to render_template(:new)
     end
@@ -47,8 +46,7 @@ RSpec.describe 'Articles', type: :request do
 
   describe 'GET /articles/:id/edit' do
     let!(:article) do
-      Article.create({ title: 'Test',
-                       body: 'This is a body is a body is a body is a booodyyyyy' })
+      FactoryBot.create(:article)
     end
 
     before do
@@ -59,15 +57,14 @@ RSpec.describe 'Articles', type: :request do
       expect(response).to have_http_status(:success)
     end
 
-    it 'renders edit page' do
+    it 'renders the edit template' do
       expect(response).to render_template(:edit)
     end
   end
 
   describe 'GET /articles/:id' do
     let!(:article) do
-      Article.create({ title: 'Test',
-                       body: 'This is a body is a body is a body is a booodyyyyy' })
+      FactoryBot.create(:article)
     end
 
     it 'returns HTTP 200 status' do
@@ -75,7 +72,7 @@ RSpec.describe 'Articles', type: :request do
       expect(response).to have_http_status(:success)
     end
 
-    it 'returns the show template' do
+    it 'renders the show template' do
       get article_path(article)
       expect(response).to render_template(:show)
     end
@@ -83,25 +80,16 @@ RSpec.describe 'Articles', type: :request do
 
   describe 'PUT /articles/:id' do
     let!(:article) do
-      Article.create({ title: 'Test',
-                       body: 'This is a body is a body is a body is a booodyyyyy' })
-    end
-
-    let(:article_params) do
-      {
-        title: 'Testing #2',
-        body: 'This is another body...this is another body...body another is this'
-      }
-    end
-    let(:invalid_article) do
-      {
-        body: 'This is another body...body another is this...'
-      }
+      FactoryBot.create(:article)
     end
 
     context 'with valid parameters' do
       before do
-        put "/articles/#{article.id}", params: { article: article_params }
+        put "/articles/#{article.id}",
+            params: {
+              article: FactoryBot.attributes_for(:article, title: 'Testing #2',
+                                                           body: 'This is a new body of text for the latest test ...')
+            }
         article.reload
       end
 
@@ -118,7 +106,7 @@ RSpec.describe 'Articles', type: :request do
 
     context 'with invalid parameters' do
       before do
-        put "/articles/#{article.id}", params: { article: invalid_article }
+        put "/articles/#{article.id}", params: { article: FactoryBot.attributes_for(:article, title: nil) }
       end
 
       it 'fails at updating the article' do
@@ -130,12 +118,11 @@ RSpec.describe 'Articles', type: :request do
 
   describe 'PATCH /articles/:id' do
     let!(:article) do
-      Article.create({ title: 'Testing',
-                       body: 'This is a body this is a body is a body is a this...' })
+      FactoryBot.create(:article)
     end
 
     it 'updates the article' do
-      patch article_url(article), params: { article: { title: 'Test #2' } }
+      patch article_url(article), params: { article: FactoryBot.attributes_for(:article, title: 'Test #2') }
       article.reload
       expect(response).to have_http_status(:found)
       expect(article.title).to eq 'Test #2'
@@ -144,8 +131,7 @@ RSpec.describe 'Articles', type: :request do
 
   describe 'DELETE /articles/:id' do
     let!(:article) do
-      Article.create({ title: 'Testing',
-                       body: 'This is a body this is a body is a body is a this...' })
+      FactoryBot.create(:article)
     end
 
     it 'deletes article, redirects to index' do
