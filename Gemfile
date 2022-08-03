@@ -19,6 +19,8 @@ gem 'turbolinks', '~> 5'
 gem 'jbuilder', '~> 2.7'
 # TailwindCSS
 gem "tailwindcss-rails", "~> 2.0"
+# Add Faker
+gem 'faker'
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 4.0'
 # Use Active Model has_secure_password
@@ -34,7 +36,7 @@ gem 'rails-controller-testing'
 gem 'bootsnap', '>= 1.4.4', require: false
 
 group :development, :test do
-  # ADd rspec-rails
+  # Add rspec-rails
   gem 'rspec-rails', '~> 6.0.0.rc1'
   # Add Capybara
   gem 'capybara'
